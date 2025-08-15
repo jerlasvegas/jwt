@@ -1,0 +1,9 @@
+url = "http://10.201.27.96/api/v1.0/example1"
+send_sig = True
+login_username = "user"
+url_username = "user"
+password = "password1"
+update_token = 1
+payload_username = "user"
+payload_admin = 0
+header_alg = "None"
