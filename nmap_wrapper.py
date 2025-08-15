@@ -1,11 +1,13 @@
 import subprocess
 import threading
 import time
+from gobuster_wrapper import GobusterWrapper, run_gobuster
 
 
 class NmapWrapper:
     def __init__(self, nmap_path="nmap"):
         self.nmap_path = nmap_path
+        self.ip_address = ''
 
     def run_scan(self, ip_address, additional_args=None, timeout=None, show_progress=True):
         """
@@ -17,6 +19,7 @@ class NmapWrapper:
             timeout: Timeout in seconds
             show_progress: Whether to show real-time output
         """
+        self.ip_address = ip_address
         cmd = [self.nmap_path, str(ip_address)]
 
         if additional_args:
@@ -50,17 +53,19 @@ class NmapWrapper:
         def read_stdout():
             import re
             # Pattern to match the specific ports
-            port_pattern = r'\b(80|8000|8080|443)/tcp\b'
+            port_pattern = r'port\s\b(80|8000|8080|443)/tcp\b'
 
             for line in iter(process.stdout.readline, ''):
                 print(f"[SCAN] {line.strip()}")
                 stdout_lines.append(line)
 
                 # Check for target ports
-                matches = re.findall(port_pattern, line)
-                for match in matches:
-                    port_with_protocol = f"{match}/tcp"
-                    my_function(port_with_protocol)
+                port = re.match(port_pattern, line)
+                if port:
+                    my_function(port)
+                    run_gobuster(self.ip_address, port)
+                    # self.run_gobuster = 1
+                    # self.http_port = match
 
             process.stdout.close()
 
@@ -123,6 +128,23 @@ def my_function(port):
     print(f"🎯 TARGET PORT DETECTED: {port}")
     # Add your custom logic here
 
+def gobuster_scan(url:str, port:str) -> None:
+    gobuster = GobusterWrapper()
+    print("Starting gobuster directory enumeration with progress display...")
+
+    # Directory enumeration scan
+    result = gobuster.run_scan(
+        url=f"{url}:{port}",
+        wordlist="/usr/share/wordlists/dirb/common.txt",
+        additional_args=["-t", "50", "-x", "php,html,txt", "--no-error"],
+        show_progress=True
+    )
+
+    print("\n" + "=" * 50)
+    if result['success']:
+        print("Scan completed successfully!")
+    else:
+        print("Scan failed:", result.get('error', result.get('stderr')))
 
 if __name__ == "__main__":
     nmap = NmapWrapper()
