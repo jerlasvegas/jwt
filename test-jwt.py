@@ -4,7 +4,6 @@ import json
 import jwt
 import requests
 import settings
-import sys
 
 
 class Connection:

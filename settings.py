@@ -1,9 +1,9 @@
-url = "http://10.201.27.96/api/v1.0/example1"
+url = "http://hammer.thm:1337"
 send_sig = True
-login_username = "user"
-url_username = "user"
-password = "password1"
-update_token = 1
-payload_username = "user"
+login_username = "tester@hammer.thm"
+url_username = "tester@hammer.thm"
+password = "tester"
+update_token = 0
+payload_username = "tester"
 payload_admin = 0
 header_alg = "None"
